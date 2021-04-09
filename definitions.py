@@ -155,7 +155,7 @@ class Tiling_graph:
 
 #Functions to load and save data.
 
-def load_plantri(filename='12pm4c3.txt'): #Returns a list of all good matrices witn N+5 vertices
+def load_plantri(filename): #Returns a list of all good matrices witn N+5 vertices
     Data = []
     string = ''
     with open(filename,'r', newline='') as file:
@@ -284,7 +284,7 @@ def clean_solution(Solution, PermSize):
     newSol = str(Solution).split(',')
     newSol[0] = newSol[0][1:]
     newSol[-1] = newSol[-1][:-1]
-    R = [-1]*PermSize
+    R = ['Not Solved']*PermSize
     for S in newSol:
         Var, Res = S.split(':')
         if(Var[0] == ' '):
@@ -325,7 +325,7 @@ def construct_angles(G):
             if side in G.G[v] and side in G.faces[f]:
                 IndexFilledSide[side-1] = i
             IndexFilledFace[f] = i
-    return Angles, set(IndexFilledSide), set(IndexFilledFace[5:])
+    return Angles, set(IndexFilledSide), set(IndexFilledFace[4:])
 
 #Functions to construct, save and load the angle permutations
 
@@ -603,7 +603,7 @@ class NodeState:
         #if it has a possible solution yet. Checks if it's acceptable.
         possiblyRes = clean_solution(eqSolution, len(P))
         for i in range(len(possiblyRes)): #Checks for each variable (-1:= no exact answer)
-            if possiblyRes[i] == -1:
+            if possiblyRes[i] == 'Not Solved':
                 continue
             if P[i] == 0:
                 if possiblyRes[i] >= 90 or possiblyRes[i] <= 0:
@@ -653,20 +653,20 @@ class NodeState:
         #if it has a possible solution yet. Checks if it's acceptable.
         possiblyRes = clean_solution(eqSolution, len(P))
         sidesSolved = 0
-        for i in range(len(possiblyRes)): #Checks for each variable (-1:= no exact answer)
-            if possiblyRes[i] == -1:
+        for i in range(len(possiblyRes)): #Checks for each variable.
+            if possiblyRes[i] == 'Not Solved':
                 continue
             if possiblyRes[i] > 1 or possiblyRes[i] <= 0:
                     return False
             sidesSolved += 1
         self.LastSideSol = possiblyRes
         
-        if len(P) == 4: #Only works for 4-side tiles 
+        if len(P) == 4: #Only works for 4-side tiles.
             if sidesSolved == len(P):
                 DiagonalsToCheck = []
-                if self.LastAngSol[0] != -1 and self.LastAngSol[2] != -1:
+                if self.LastAngSol[0] != 'Not Solved' and self.LastAngSol[2] != 'Not Solved':
                     DiagonalsToCheck.append([0,2])
-                if self.LastAngSol[1] != -1 and self.LastAngSol[3] != -1:
+                if self.LastAngSol[1] != 'Not Solved' and self.LastAngSol[3] != 'Not Solved':
                     DiagonalsToCheck.append([1,3])
                 for AngPair in DiagonalsToCheck:
                     a1 = self.LastSideSol[AngPair[0]-1]
