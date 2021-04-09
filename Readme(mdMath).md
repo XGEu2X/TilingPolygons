@@ -83,7 +83,7 @@ print(f'Left with {len(FinalNodes)} graphs.')
 
 You only need to run the notebook in order. If you have run a previous filter, you can uncomment the first line of the next box to use that calculated data.
 
-## Outputs
+## Output
 The output is a list of lists. Each one containing objects that says which graph it is (with the indices in the input), with which permutation of angle-types (with the index it has in the generated perms file), and some additional information used in the process.
 \
 \
