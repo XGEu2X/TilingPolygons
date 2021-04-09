@@ -28,9 +28,9 @@ First we need the files with the graphs associated with the possible admissible 
 </div></code></pre>
 <h2 id="usage-4" data-line="26" class="code-line">Usage</h2>
 <h3 id="one-notebook-for-each-amount-of-tiles-2" data-line="27" class="code-line">One notebook for each amount of tiles</h3>
-<p data-line="28" class="code-line">\</p>
-<p data-line="30" class="code-line">In each file, named TilingSearch<eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span></eq>.ipynb, we first add a new graph for each possible distinguished vertex.</p>
-<pre><code data-line="32" class="code-line language-python"><div>inputs = tqdm(Graphs7)
+<p data-line="28" class="code-line"><br>
+In each file, named TilingSearch<eq><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi></mrow><annotation encoding="application/x-tex">N</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span></eq>.ipynb, we first add a new graph for each possible distinguished vertex.</p>
+<pre><code data-line="31" class="code-line language-python"><div>inputs = tqdm(Graphs7)
 
 <span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:
     processed_list = Parallel(n_jobs=num_cores)(delayed(add_distinguished)(G) <span class="hljs-keyword">for</span> G <span class="hljs-keyword">in</span> inputs)
@@ -40,8 +40,8 @@ Graphs7 = [G <span class="hljs-keyword">for</span> DGraph <span class="hljs-keyw
 print(<span class="hljs-string">f&#x27;Constructed <span class="hljs-subst">{<span class="hljs-built_in">len</span>(Graphs7)}</span> graphs with a distinguished vertex.&#x27;</span>)
 save_data(Graphs7,<span class="hljs-string">&#x27;all_tiling_grahps_7.txt&#x27;</span>)
 </div></code></pre>
-<p data-line="44" class="code-line">After that the remaining graphs pass through some filters based in some configurations that is known are not possible.</p>
-<pre><code data-line="46" class="code-line language-python"><div><span class="hljs-comment">#Graphs7 = load_data(&#x27;all_tiling_grahps_7.txt&#x27;)</span>
+<p data-line="43" class="code-line">After that the remaining graphs pass through some filters based in some configurations that is known are not possible.</p>
+<pre><code data-line="45" class="code-line language-python"><div><span class="hljs-comment">#Graphs7 = load_data(&#x27;all_tiling_grahps_7.txt&#x27;)</span>
 
 inputs = tqdm(Graphs7)
 
@@ -53,11 +53,11 @@ Graphs7 = [Graphs7[i] <span class="hljs-keyword">for</span> i <span class="hljs-
 print(<span class="hljs-string">f&#x27;Left with <span class="hljs-subst">{<span class="hljs-built_in">len</span>(Graphs7)}</span> graphs after first filter.&#x27;</span>)
 save_data(Graphs7,<span class="hljs-string">&#x27;filtered_tiling_grahps_7.txt&#x27;</span>)
 </div></code></pre>
-<p data-line="60" class="code-line">Notice that we have commented the line in which it can be loaded the previous results instead of calculate everything from the start.
+<p data-line="59" class="code-line">Notice that we have commented the line in which it can be loaded the previous results instead of calculate everything from the start.
 <br>
 <br>
 The last part consists in exhaust the remaining graphs using a deep-search algorithm to assign angles and sides to each piece and see if it could be an achievable tiling.</p>
-<pre><code data-line="65" class="code-line language-python"><div><span class="hljs-comment">#Graphs7_4 = load_data(&#x27;quadrilateral_tiling_grahps_7.txt&#x27;)</span>
+<pre><code data-line="64" class="code-line language-python"><div><span class="hljs-comment">#Graphs7_4 = load_data(&#x27;quadrilateral_tiling_grahps_7.txt&#x27;)</span>
 
 save_ang_perms(<span class="hljs-number">4</span>,<span class="hljs-string">&#x27;4_perms.txt&#x27;</span>)
 
@@ -71,10 +71,10 @@ FinalNodes = [Nodes <span class="hljs-keyword">for</span> Nodes <span class="hlj
 
 print(<span class="hljs-string">f&#x27;Left with <span class="hljs-subst">{<span class="hljs-built_in">len</span>(FinalNodes)}</span> graphs.&#x27;</span>)
 </div></code></pre>
-<h2 id="usage-5" data-line="81" class="code-line">Usage</h2>
-<p data-line="83" class="code-line">You only need to run the notebook in order. If you have run a previous filter, you can uncomment the first line of the next box to use that calculated data.</p>
-<h2 id="output-2" data-line="85" class="code-line">Output</h2>
-<p data-line="86" class="code-line">The output is a list of lists. Each one containing objects that says which graph it is (with the indices in the input), with which permutation of angle-types (with the index it has in the generated perms file), and some additional information used in the process.
+<h2 id="usage-5" data-line="80" class="code-line">Usage</h2>
+<p data-line="82" class="code-line">You only need to run the notebook in order. If you have run a previous filter, you can uncomment the first line of the next box to use that calculated data.</p>
+<h2 id="output-2" data-line="84" class="code-line">Output</h2>
+<p data-line="85" class="code-line">The output is a list of lists. Each one containing objects that says which graph it is (with the indices in the input), with which permutation of angle-types (with the index it has in the generated perms file), and some additional information used in the process.
 <br>
 <br>
 In the case the output is empty, means that all the cases were exhausted.</p>
