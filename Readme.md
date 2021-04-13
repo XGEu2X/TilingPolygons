@@ -85,6 +85,5 @@ You only need to run the notebook in order. If you have run a previous filter, y
 
 ## Output
 The output is a list of lists. Each one containing objects that says which graph it is (with the indices in the input), with which permutation of angle-types (with the index it has in the generated perms file), and some additional information used in the process.
-\
-\
+
 In the case the output is empty, means that all the cases were exhausted.
