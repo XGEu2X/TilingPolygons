@@ -25,8 +25,8 @@ Graphs7 = load_plantri(filename='12pm4c3')
 ```
 
 ## Usage
+
 ### One notebook for each amount of tiles
-\
 
 In each file, named TilingSearch**N**.ipynb, we first add a new graph for each possible distinguished vertex.
 
@@ -78,8 +78,6 @@ FinalNodes = [Nodes for Nodes in processed_list if len(Nodes)>0]
 
 print(f'Left with {len(FinalNodes)} graphs.')
 ```
-
-## Usage
 
 You only need to run the notebook in order. If you have run a previous filter, you can uncomment the first line of the next box to use that calculated data.
 
