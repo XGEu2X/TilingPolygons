@@ -1,5 +1,4 @@
 #Dependencies.
-
 import copy
 import math
 import networkx as nx
@@ -12,30 +11,26 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-#The class for the grahps.
-#
-#The distinguished vertex should be 0 and its neighbours 1,2,3,4 in counter-clockwise order.
-#
+#The class for grahps with a distinguished vertex S_0 labeled as 0.
+#The distinguished vertex is 0 and its neighbours 1,2,3,4 in counter-clockwise order.
 #As in plantri, G[i] contains the vertices andyacent to vertex i in counter-clockwise order. If i is 1,2,3 or 4, G[i] should start with i-1,0,i+1.
-#
-#The faces should begin with the outer faces 012, 023, 034, 041, followed by the corner faces containing 12, 23, 34, 41 in that order. Then the faces containing sides 1,2,3 or 4.
-#
-#The corner faces should begin with 21, 32, 43 or 14.
-#
-#faces_containing_vertex[i] gives the faces containing vertex i in counter-clockwisse order. If i is 1,2,3,4, then it should begin with the 2 outer faces.
-
+#The faces (which correspond to vertices of the tiles) begin with the outer faces 012, 023, 034, 041, followed by the corner faces containing 12, 23, 34, 41 in that order. Then the faces containing sides 1,2,3 or 4.
+#The corner faces (which correspond to the vertices of the square) begin with 21, 32, 43 or 14.
+#faces_containing_vertex[i] gives the faces containing vertex i in counter-clockwisse order. If i is 1,2,3,4, then it begins with the 2 outer faces.
 class Tiling_graph:
     def __init__(self, G):
         self.G = G
         self.faces = []
         self.facesContainingVertex = [[] for g in self.G]
     
-    def ady(self,i,j): #Decides if tile i and j are adyacent
+    #Decides if tile i and j are adyacent
+    def ady(self,i,j):
         if i in self.G[j]:
             return True
         return False
     
-    def reorder(self,P): #Reorders labels according to the permutation P, P[i] gets relabeled to i
+    #Reorders labels according to the permutation P, P[i] gets relabeled to i
+    def reorder(self,P):
         GG = []
         for i in P:
             VV = [P.index(j) for j in self.G[i]]
@@ -51,8 +46,9 @@ class Tiling_graph:
             ind = self.G[i].index(0)
             self.G[i] = self.G[i][ind-1:] + self.G[i][:ind-1]
         self.build_faces()
-        
-    def is_pyramid(self,v): #Determines if the vertex v is the apex of a square pyramid
+    
+    #Determines if the vertex v is the center of the wheel graph W_5
+    def is_pyramid(self,v):
         if len(self.G[v]) != 4:
             return False
         for i in range(4):
@@ -66,15 +62,17 @@ class Tiling_graph:
             if self.ady(self.G[v][i],self.G[v][j]):
                 return False
         return True
-        
-    def pyramid_apexes(self): #Lists all vertices that serve as pyramid apex
+    
+    #Lists all vertices that are the center of a wheel graph W_5
+    def pyramid_apexes(self):
         gV = []
         for i,d in enumerate([len(g) for g in self.G]):
             if self.is_pyramid(i):
                 gV.append(i)
         return gV
-
-    def nx_graph(self): #returns a networkx graph
+    
+    #returns a networkx graph
+    def nx_graph(self):
         H=nx.Graph()
         H.add_nodes_from(range(len(self.G)))
         for i,g in enumerate(self.G):
@@ -86,7 +84,8 @@ class Tiling_graph:
         H.nodes[0]['0']='0'
         return H
     
-    def is_0iso(self,L): #Decides if there is an isomorphism which fixes 0 between self and a graph in L
+    #Decides if there is an isomorphism which fixes 0 between self and a graph in L
+    def is_0iso(self,L):
         for H in L:
             G = self.nx_graph()
             if nx.algorithms.isomorphism.is_isomorphic(G, H.nx_graph(),
@@ -94,7 +93,8 @@ class Tiling_graph:
                 return True
         return False
     
-    def build_faces(self): #Builds the faces of G
+    #Builds the faces of G
+    def build_faces(self):
         Marks = [[False]*len(g) for g in self.G]
         OuterFaces = [None]*4
         CornerFaces = [None]*4
@@ -144,13 +144,15 @@ class Tiling_graph:
             ind = self.facesContainingVertex[i].index((i-1)%4)
             self.facesContainingVertex[i] = self.facesContainingVertex[i][ind:] + self.facesContainingVertex[i][:ind]
     
-    def draw2(self): #Draws using networkx.draw_planar
+    #Draws using networkx.draw_planar
+    def draw2(self):
         G=self.nx_graph()
         G.remove_node(0)
         nx.draw_planar(G, with_labels = True)
         plt.show()
-        
-    def draw(self,iterations=7): #Draws using networkx's spring:layout starting with a fixed square.
+    
+    #Draws using networkx's spring layout starting with a fixed square. May not be planar.
+    def draw(self,iterations=7):
         G=self.nx_graph()
         G.remove_node(0)
         pos = {}
@@ -159,10 +161,10 @@ class Tiling_graph:
             pos[i]=(0.5,0.5)
         nx.draw(G,pos=nx.spring_layout(G,pos=pos,fixed=[1,2,3,4],iterations=7),with_labels=True)
         plt.show()
+#Class ends here
 
-#Functions to load and save data.
-
-def load_plantri(filename): #Returns a list of all good matrices witn N+5 vertices
+#Takes output from plantri and returns a list of graphs
+def load_plantri(filename):
     Data = []
     with open(filename,'r', newline='') as file:
         string = ''.join(file.readlines())
@@ -183,6 +185,7 @@ def load_plantri(filename): #Returns a list of all good matrices witn N+5 vertic
             first_line_of_graph = True
     return Data
 
+#Saves a list of graphs
 def save_data(Data,filename):
     with open(filename,'w') as file:
         for G in Data:
@@ -190,6 +193,7 @@ def save_data(Data,filename):
             for v in G.G:
                 file.write(str(v)[1:-1]+'\n')
 
+#Loads a list of graphs
 def load_data(filename):
     Data = []
     with open(filename,'r') as file:
@@ -210,9 +214,8 @@ def load_data(filename):
                 First_line = True
     return Data
 
-#A function that identifies the possible distinguished vertices of a graph and returns a list of the graphs with this distinguished vertex.
-
-def add_distinguished(G): #Constructs the grahps with an apex labeled as 0
+#Identifies the possible distinguished vertices of a graph and returns a list of the graphs with the distinguished vertex labeled as 0.
+def add_distinguished(G):
     graphs = []
     for v in G.pyramid_apexes():
         P = [] #Construct permutation with apex and neighbours first
@@ -226,10 +229,10 @@ def add_distinguished(G): #Constructs the grahps with an apex labeled as 0
             graphs.append(G0)
     return graphs
 
-#Functions for filtering the list of graphs.
-
+#Returns False iff G contains a vertex corresponding to a tile which intersects consecutive sides but doesn't contain the vertex inbetween
 def first_filter(G):
     sideTiles = [None]*4
+    #sideTiles[i] contains the tiles touching side i
     for i in range(4):
         sideTiles[i] = {t for j in G.facesContainingVertex[1+i] for t in G.faces[j]}.difference({0,1,2,3,4})
     for i in range(4):
@@ -238,43 +241,48 @@ def first_filter(G):
             return False
     return True
 
+#Returns False iff G contains a tile touching opposite sides
 def second_filter(G):
     for i in range(2):
+        #side1 and side3 are opposite sides
         side1 = G.G[1+i]
         side3 = G.G[3+i]
         problems = set(side1).intersection(side3).difference({0,1,2,3,4})
         if len(problems) >= 1: 
-            #print(list(problems))
             return False
     return True
 
+#Checks if G has min degree at least d
 def has_min_deg(G, d):
     mindeg = min([len(g) for g in G.G[5:]])
     if mindeg >=d:
         return True
     return False
 
-#Auxiliary functions for the angle search
-
+#Checks if face f corresponds to a vertex of the square
 def is_corner(f,G):
     F = G.faces[f]
     if F[1]<=4:
         return True
     return False
 
+#Checks if face f corresponds to a vertex of the tiling on a side of the square which is not a vertex of the square
 def is_side(f,G):
     F = G.faces[f]
     if F[0]<=4 and not is_corner(f,G):
         return True
     return False
 
-#Returns faces f1,f2 such that (v,f1), (v,f), (v,f2) are consecutive angles
+#A pair (v,f), where v is a vertex and f is a face, corresponds to the angle of a tile
+
+#Returns faces f1,f2 such that (v,f1), (v,f), (v,f2) are consecutive angles on the tile corresponding to v
 def adj_angles(v,f,G):
     Fs = G.facesContainingVertex[v]
     ind = Fs.index(f)
     return ((Fs[ind-1],Fs[(ind+1)%len(Fs)]))
 
-#Tile containing opposite side
+#Assuming f1 and f2 determine a side of the tile corresponding to v
+#Returns the tile adjacent to v which also contains f1 and f2
 def adj_side(v,f1,f2,G):
     F1 = G.faces[f1]
     F2 = G.faces[f2]
@@ -285,6 +293,7 @@ def adj_side(v,f1,f2,G):
     elif F2[ind2-1] == F1[(ind1+1)%len(F1)]:
         return F2[ind2-1]
 
+#Takes the solution of the linear solver and turns it into a list with the solutions (perhaps symbolic) to each variable
 def clean_solution(Solution, PermSize, Rectangle):
     newSol = str(Solution).split(',')
     newSol[0] = newSol[0][1:]
@@ -305,7 +314,8 @@ def clean_solution(Solution, PermSize, Rectangle):
     if Rectangle:
         return R,RectSide
     return R
-    
+
+#Gives a list of angles (vertex-face pairs) in the order in which they will be assigned
 def construct_angles(G):
     visitedTiles = set()
     Angles = []
@@ -338,14 +348,14 @@ def construct_angles(G):
             IndexFilledFace[f] = i
     return Angles, set(IndexFilledSide), set(IndexFilledFace[4:])
 
-#Functions to construct, save and load the angle permutations
-
+#Checks if a list has two consecutive ones, this is used to check if a tile has two consecutive right angles
 def has_consec_ones(L):
     for i in range(len(L)):
         if L[i-1] == L[i] == 1:
             return True
     return False
 
+#Generates the possible angle-type permutations
 def angle_perms(numSides, Rectangle):
     MinAngle = [1,90,91]
     MaxAngle = [89,90,179]
@@ -368,6 +378,7 @@ def angle_perms(numSides, Rectangle):
             AngPerms.append(list(I))
     return AngPerms
 
+#Generates and saves in a file the possible angle-type permutations
 def save_ang_perms(numSides,filename, Rectangle = False):
     AngPerms = angle_perms(numSides, Rectangle)
     with open(filename,'w') as file:
@@ -377,6 +388,7 @@ def save_ang_perms(numSides,filename, Rectangle = False):
                 S += f'{i},'
             file.write(S[:-1] + '\n')
 
+#Loads from a file the possible angle-type permutations
 def load_ang_perms(filename):
     AngPerms = []
     with open(filename,'r') as file:
@@ -384,19 +396,23 @@ def load_ang_perms(filename):
             AngPerms.append([int(i) for i in l.split(',')])
     return AngPerms
 
-#The class for the nodes
-#angle-types: a -> 0, r -> 1, o -> 2, p->3
-
+#The class for the nodes in the tree of possible angle assignments.
+#angle-types: a -> 0, r -> 1, o -> 2, p -> 3
 class NodeState:
+    #ig: the index of the graph
+    #ip: index of angle-type permutation
     #G: graph G
     #P: the angle-type permutation
+    #Angles: list of angles (vertex-face pairs) in the order in which they will be assigned
+    #Rectangle: True if we are in the rectangular case
+    #PrintProof: If True, prints all arguments used to analyse this graph
     def __init__(self, ig, ip, G, P, Angles, Rectangle=False, PrintProof = False):
-        self.iP = ip #index of angle-type permutation
-        self.iG = ig #index of G
-        
+        self.iP = ip
+        self.iG = ig
         self.Rectangle = Rectangle
         self.PrintProof = PrintProof
         
+        #Angle and side equations
         eq=''
         for i in range(len(P)):
             eq += f'x{i}+'
@@ -404,18 +420,24 @@ class NodeState:
         self.AngleEqs = [eq]
         self.SideEqs = []
         
+        #The values of the angles and sides of the tile T
         self.LastAngSol = ['Not Solved']*len(P)
         self.LastSideSol = ['Not Solved']*len(P)
         self.R = 'Not Solved'
         if not Rectangle:
             self.R = 1
         
+        #The index of the next angle to be assigned
         self.indexAngle = 0
         
-        #Assignation of the angles for each tile
+        #Assignation of the angle-type for each angle of the tiling, -1 means unassigned
         self.Assigned = {a:-1 for a in Angles}
         
-        #ToAssign[v] contains the list of possible assignations. len(P) represents a plain angle.
+        #Assume that the angles of T are labeled from 0 to len(P)-1 in cyclic order
+        #If v is a tile, then each vertex of v should be in correspondance with a vertex of T
+        #ToAssign[v] is a list with one set for each of its vertices
+        #Each of these sets contains the possible indices of angles of T which may be assigned to it
+        #A value of len(P) represents a plain angle
         self.ToAssign = [{i for i in range(len(P))} for T in G.G]
         for i,T in enumerate(G.G):
             if len(T) > len(P):
@@ -445,9 +467,9 @@ class NodeState:
                 self.MaxFaceSums[f] += 180
                 self.MinFaceSums[f] += 1
     
-    #-----------------
+    #Creates and returns the valid successor nodes
     def next(self, Angles, P, G, IndexFilledSide, IndexFilledFace):
-        Res = [] #list of branches
+        Res = [] #list of successors
         
         v,f = Angles[self.indexAngle]
         
@@ -466,7 +488,8 @@ class NodeState:
         if self.PrintProof:
             print('---')
         return Res
-    #-----------------
+    
+    #Checks if a new node is valid
     def step(self, assign, Angles, P, G, IndexFilledSide, IndexFilledFace):
         v,f = Angles[self.indexAngle]
         self.Assigned[(v,f)] = assign
@@ -505,6 +528,7 @@ class NodeState:
                 return False
         self.indexAngle += 1
         return True
+    
     #-----------------
     def check_special_conds(self, Angles, P, G, IndexFilledSide, IndexFilledFace):
         if len(P) == 4: #Only works for 4-side tiles.
@@ -587,14 +611,6 @@ class NodeState:
             #Special condition for 'arro' perm
             if P in [[0,1,1,2],[1,0,2,1],[1,1,0,2]]:
                 Consistent = True
-                #sides = [None]*5
-                #if len(self.SideEqs)>1:
-                #    for s,v in solve(self.SideEqs).items():
-                #        sides[int(str(s)[1])] = v
-                #    if sides[0]!=None and sides[2]!=None and sides[0]==sides[2]:
-                #        Consistent=False
-                #    if sides[1]!=None and sides[3]!=None and sides[1]==sides[3]:
-                #        Consistent=False
                 if P == [0,1,1,2]:
                     a,b,c,d,ang=self.LastSideSol[1],self.LastSideSol[0],self.LastSideSol[3],self.LastSideSol[2],self.LastAngSol[0]
                 elif P == [1,0,2,1]:
@@ -621,6 +637,7 @@ class NodeState:
                         print(f'Failed special arro condition with angle {ang} and sides {self.LastSideSol}')
                     return False
         return True
+    
     #-----------------
     def poss_angs(self,Angles,G,P):
         Res = []
@@ -805,7 +822,6 @@ class NodeState:
         self.LastAngSol = possiblyRes
         return True
     
-    #-----------------
     #Side 0 is between angles 0 and 1
     def side_var(self,v,f1,f2,P):
         i = min(self.Assigned[v,f1],self.Assigned[v,f2])
@@ -883,7 +899,6 @@ class NodeState:
         return True
 
 #The function which explores the tree
-
 def search(ig, G, PermsFileName, PrintProof = False, Rectangle = False): #index of graph, graph, number of sides
     Res = [] #Contains final result
     Perms = load_ang_perms(PermsFileName) #List of possible angle-types a tile may have
