@@ -529,10 +529,12 @@ class NodeState:
         self.indexAngle += 1
         return True
     
-    #-----------------
+    #Check conditions for specific setups.
     def check_special_conds(self, Angles, P, G, IndexFilledSide, IndexFilledFace):
-        if len(P) == 4: #Only works for 4-side tiles.
+        #Conditions for quadrilateral tilings.
+        if len(P) == 4:
             sidesSolved = 4 - self.LastSideSol.count('Not Solved')
+            #Check if the deduced diagonals matches. Also check if the area is correct.
             if sidesSolved == 4:
                 DiagonalsToCheck = []
                 if self.LastAngSol[0] != 'Not Solved' and self.LastAngSol[2] != 'Not Solved':
@@ -573,7 +575,7 @@ class NodeState:
                             return False
                         if self.PrintProof:
                             print(f'Passed area test: {A}')
-            #Special condition for 'aror' perm
+            #Condition for 'aror' angle labeling.
             if P in [[0,1,2,1],[1,0,1,2]]:
                 Consistent = True
                 if P == [0,1,2,1]:
@@ -608,7 +610,7 @@ class NodeState:
                     if self.PrintProof:
                         print(f'Failed special aror condition with angle {ang} and sides {self.LastSideSol}')
                     return False
-            #Special condition for 'arro' perm
+            #Condition for 'arro' angle labeling.
             if P in [[0,1,1,2],[1,0,2,1],[1,1,0,2]]:
                 Consistent = True
                 if P == [0,1,1,2]:
@@ -638,7 +640,7 @@ class NodeState:
                     return False
         return True
     
-    #-----------------
+    #Assigns an angle-type to the given tiling-vertex.
     def poss_angs(self,Angles,G,P):
         Res = []
         v,f = Angles[self.indexAngle]
@@ -653,8 +655,9 @@ class NodeState:
                 Res.append(assign)
         return Res    
 
-    #-----------------
+    #Check if the given angle type at can be successful assigned to the tiling-vertex (v,f) without breaking tile conditions. 
     def check_tile(self,v,f,assign,at,G,P):
+        #If it's plane there's nothing to check.
         if at == 3:
             return True
         if len(P) == sum(self.ToAssignAT[v][:3]):
@@ -690,7 +693,7 @@ class NodeState:
             print(f'Passed tile test.')
         return True
     
-    #-----------------
+    #Check if the given angle type at can be successful assigned to the tiling-vertex (v,f) without breaking face conditions.
     def check_face(self,v,f,at,G,P):
         #This works because we have few faces and sides
         maxangle = {0:89,1:90,2:179,3:180,-1:180}
@@ -709,7 +712,8 @@ class NodeState:
             print('Passed face test.')
         return True
     
-    #-----------------
+    #Given a tiling-vertex (v,f) and a direction, returns the minimum segment from (v,f) in that direction
+    # in which we can deduce a side equation.
     def segment_for_eqs(self,v,f,direction,G,P):
         #direction is 0 (clockwise from v) or 1 (conterclockwise)
         #Lists of v,f1,v1,f2,... defining the sides on a segment starting at v,f
@@ -738,7 +742,7 @@ class NodeState:
                 ChangeUpTile = False
             f1 = f2
     
-    #-----------------
+    #Returns which sides where filled in this iteration. The format is (L,U), where L = U and L (and U) are successions of tiling-vertices.
     def filled_sides(self,Angles,IndexFilledSide,G,P):
         Res = []
         v,f = Angles[self.indexAngle]
@@ -773,7 +777,7 @@ class NodeState:
                     Res.append((L1,U1))
         return Res
     
-    #-----------------
+    #Adds the new angle equations given by the current assignation. Returns false if the new system has no solution. True if it is still open.
     def add_face_eq(self, f, G, P):
         NewEq = ''
         straightCounter = 0
@@ -829,7 +833,7 @@ class NodeState:
              i = len(P)-1
         return f'x{i}'
     
-    #-----------------
+    #Adds the new sides equations given by the current assignation. Returns false if the new system has no solution. True if it is still open.
     def add_side_eq(self, sides, G, P):
         for s in sides:
             #Eqs for a side of the square
@@ -906,6 +910,7 @@ def search(ig, G, PermsFileName, PrintProof = False, Rectangle = False): #index 
     #An angle is a pair (v,F) where v is a tile and F is a face of G containing v
     Angles, IndexFilledSide, IndexFilledFace = construct_angles(G)
     
+    #Checks if the graph could become from a tiling for each labeling.
     for ip, P in enumerate(Perms):
         if PrintProof:
             print(f'\nPermutation: {P}\n')
@@ -923,6 +928,7 @@ def search(ig, G, PermsFileName, PrintProof = False, Rectangle = False): #index 
             else:
                 if PrintProof:
                     print(f'Not considering assigning {N0.Assigned[Angles[0]]}')
+                    
         while len(Stack) > 0:
             Branch = Stack.pop()
             if(Branch.indexAngle == len(Angles)):
