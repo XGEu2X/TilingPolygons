@@ -407,11 +407,9 @@ def load_ang_perms(filename):
             AngPerms.append([int(i) for i in l.split(',')])
     return AngPerms
 
+#Dictionary for angle types
+at_dict = []
 #The class for the nodes
-#angle-types: a -> 0, r -> 1, o -> 2, p->3
-
-#The class for the nodes in the tree of possible angle assignments.
-#angle-types: a -> 0, r -> 1, o -> 2, p -> 3
 class NodeState:
         #ig: the index of the graph
     #ip: index of angle-type permutation
@@ -421,10 +419,12 @@ class NodeState:
     #use5AT: If True, uses labels for angle types cutting acute in 3 different cases: (0,45), [45,45], (45,90)
     #PrintProof: If True, prints all arguments used to analyse this graph
     def __init__(self, ig, ip, G, P, Angles, use5AT = False, PrintProof = False):
+        
         self.iP = ip #index of angle-type permutation
         self.iG = ig #index of G
         
         self.PrintProof = PrintProof
+        self.Case = ''
         
         #Angle equations
         eq=''
@@ -514,23 +514,39 @@ class NodeState:
         v,f = Angles[self.indexAngle]
         
         if self.PrintProof:
-            print(f'Assigning angle {v}, {G.faces[f]}.')
+            if self.indexAngle > 1:
+                print(f'\nCase {self.Case} has the following possibilities:')
+            elif self.indexAngle == 1:
+                print(f'\nThis case has the following possibilities:')
+            print(f'  Assigning the angle in tile {v} incident to tiles {G.faces[f]}')
         
         PossibleAssignments = self.poss_angs(Angles,G,P)
         
         if self.PrintProof:
-            print(f'Possible assignments: {PossibleAssignments}')
+            print(f'  Possible assignments: {PossibleAssignments}'.replace(str(len(P)),'p'))
         
-        for assign in PossibleAssignments:
+        for case,assign in enumerate(PossibleAssignments):
+            
+            NewBranch = copy.deepcopy(self)
+            if self.PrintProof:
+                if self.indexAngle > 0:
+                    NewBranch.Case += f'{case+1}.'
+                    print(f'\nCase {NewBranch.Case}')
+                else:
+                    print('')
+                print(f'  Assign {assign}'.replace(str(len(P)),'p') + f' to ({v}, {G.faces[f]})')
             
             #for triangles only
             if len(P) == 3 and assign != len(P):
                 if P[assign] == 3 and ((v,f) in self.nonRight):
+                    if self.PrintProof:
+                        print(f'      Impossible: ({v},{f}) can not have a right angle, violates Lemma 9')
                     continue
                 if P[assign] != 0 and ((v,f) in self.miniAcute):
+                    if self.PrintProof:
+                        print(f'      Impossible: ({v},{f}) can not have an angle <= Pi/4, violates Lemma 9')
                     continue
             
-            NewBranch = copy.deepcopy(self)
             if NewBranch.step(assign, Angles, P, G, IndexFilledFace):
                 Res.append(NewBranch)
         if self.PrintProof:
@@ -562,10 +578,12 @@ class NodeState:
         #Check face equations
         if self.indexAngle in IndexFilledFace:
             if not self.add_face_eq(f,G,P):
-                if self.PrintProof:
-                    print(f'Assignmment {assign} failed face equations.')
+#                if self.PrintProof:
+#                    print(f'Assignmment {assign} failed face equations.')
                 return False
             self.FaceFilled = False
+        elif self.PrintProof:
+            print(f'    No new angle equation')
         self.indexAngle += 1
         return True
     
@@ -576,10 +594,14 @@ class NodeState:
         for assign in self.ToAssign[v]:
             if assign < len(P):
                 at = P[assign]
+                if self.PrintProof:
+                    print(f'    - to vertex {assign} of T which has angle-type \'{at_dict[at]}\'')
+                    if self.indexAngle == 0:
+                        print(f'      Only this vertex of T is considered, cyclic permutations of this labeling are considered separately')
             else:
                 at = self.numAT
-            if self.PrintProof:
-                print(f'Trying to assign {assign}, angle-type {at}')
+                if self.PrintProof:
+                    print(f'    Angle-type \'p\'')
             if self.check_tile(v,f,assign,at,G,P) and self.check_face(v,f,at,G,P):
                 Res.append(assign)
         return Res    
@@ -598,7 +620,7 @@ class NodeState:
             if 0 <= a < len(P):
                 if (assign - a)%len(P) not in {1,len(P)-1}:
                     if self.PrintProof:
-                        print(f'Failed tile test.')
+                        print(f'      Impossible: The angles of this tile would be in the wrong order')
                     return False
                 break
             if a == -1:
@@ -611,14 +633,12 @@ class NodeState:
             if 0 <= a < len(P):
                 if (assign - a)%len(P) not in {1,len(P)-1}:
                     if self.PrintProof:
-                        print(f'Failed tile test.')
+                        print(f'      The angles of this tile would be in the wrong order')
                     return False
                 break
             if a == -1:
                 break
             i = (i-1)%len(G.facesContainingVertex[v])
-        if self.PrintProof:
-            print(f'Passed tile test.')
         return True
     
     #Check if the given angle type at can be successful assigned to the tiling-vertex (v,f) without breaking face conditions.
@@ -634,14 +654,12 @@ class NodeState:
         MinSum = self.MinFaceSums[f] - minangle[-1] + minangle[at]
         if MinSum > 0:
             if self.PrintProof:
-                print(f'Angle-type sum too large by at least {MinSum}')
+                print(f'      Impossible: Sum of angles at this tiling-vertex would be too large')
             return False
         if MaxSum < 0:
             if self.PrintProof:
-                print(f'Angle-type sum too small by at least {-MaxSum}')
+                print(f'      Impossible: Sum of angles at this tiling-vertex would be too small')
             return False
-        if self.PrintProof:
-            print('Passed face test.')
         return True
     
     #Adds the new angle equations given by the current assignation. Returns false if the new system has no solution. True if it is still open.
@@ -712,23 +730,23 @@ def search(ig, G, PermsFileName, use5AT = False, PrintProof = False): #index of 
     #An angle is a pair (v,F) where v is a tile and F is a face of G containing v
     Angles, IndexFilledFace = construct_angles(G)
     
+    #if using 5AT changes at_dict
+    global at_dict
+    if use5AT:
+        at_dict = {0:'(sa)',1:'(ma)',2:'(la)',3:'r',4:'(so)',5:'(mo)',6:'(lo)',7:'p'}
+    else:
+        at_dict = {0:'a',1:'r',2:'o',3:'p'}
+        
     for ip, P in enumerate(Perms):
         if PrintProof:
-            print(f'\nPermutation: {P}\n')
+            print(f'\nAssuming T has labeling: {"".join([at_dict[p] for p in P])}\n')
         Stack = []
         N = NodeState(ig, ip, G, P, Angles, use5AT, PrintProof)
         NList = N.next(Angles, P, G, IndexFilledFace)
         #This assures you assign the first angletype to the first angle
         for N0 in NList:
-            if N0.Assigned[Angles[0]] == 0:
-                Stack.append(NList[0])
-                if PrintProof:
-                    print(f'Only considering assigning 0')
-                else:
-                    break
-            else:
-                if PrintProof:
-                    print(f'Not considering assigning {N0.Assigned[Angles[0]]}')
+            #if N0.Assigned[Angles[0]] == 0:
+            Stack.append(NList[0])
         while len(Stack) > 0:
             Branch = Stack.pop()
             if(Branch.indexAngle == len(Angles)):
@@ -739,5 +757,5 @@ def search(ig, G, PermsFileName, use5AT = False, PrintProof = False): #index of 
             NewBranches = Branch.next(Angles, P, G, IndexFilledFace)
             Stack.extend(NewBranches)
         if PrintProof:
-            print(f'\nFound {len(Res)} possible solutions.\n')
+            print(f'\nFound {len(Res)} possible solutions.\n\n-------------------------------------------------')
     return Res
