@@ -544,13 +544,11 @@ class NodeState:
                     continue
                 if P[assign] != 0 and ((v,f) in self.miniAcute):
                     if self.PrintProof:
-                        print(f'      Impossible: ({v},{f}) can not have an angle <= Pi/4, violates Lemma 9')
+                        print(f'      Impossible: ({v},{f}) can not have an angle <= 45, violates Lemma 9')
                     continue
             
             if NewBranch.step(assign, Angles, P, G, IndexFilledFace):
                 Res.append(NewBranch)
-        if self.PrintProof:
-            print('---')
         return Res
     
     #Checks if a new node is valid
@@ -592,6 +590,8 @@ class NodeState:
         Res = []
         v,f = Angles[self.indexAngle]
         for assign in self.ToAssign[v]:
+            if self.indexAngle == 0:
+                assign = 0
             if assign < len(P):
                 at = P[assign]
                 if self.PrintProof:
@@ -604,6 +604,8 @@ class NodeState:
                     print(f'    Angle-type \'p\'')
             if self.check_tile(v,f,assign,at,G,P) and self.check_face(v,f,at,G,P):
                 Res.append(assign)
+            if self.indexAngle == 0:
+                break
         return Res    
 
     #Check if the given angle type at can be successful assigned to the tiling-vertex (v,f) without breaking tile conditions. 
@@ -681,11 +683,11 @@ class NodeState:
             NewEq += f'-{360 - straightCounter*180}'
         self.AngleEqs.append(NewEq)
         if self.PrintProof:
-            print(f'New face equation: {NewEq}')
+            print(f'    New angle equation: {NewEq}=0')
         #Checks if the system can still be solved. Or if it's solved with a non acceptable answer. 
         eqSolution = solve(self.AngleEqs, rational=None)
         if self.PrintProof:
-            print(f'Reduced equations: {eqSolution}')
+            print(f'    Reduced angle equations:\n' + f'      {eqSolution}'.replace(':',' =').replace('.0000000000000','.0').replace('.000000000000','.0'))
         if len(eqSolution) == 0:
             return False
         #if it has a possible solution yet. Checks if it's acceptable.
@@ -693,6 +695,8 @@ class NodeState:
         for i in range(len(possiblyRes)): #Checks for each variable
             #Special condition: quadrilateral
             if self.non45 and possiblyRes[i] == 45:
+                if self.PrintProof:
+                    print(f'      Impossible: ({v},{f}) can not have an angle of 45, violates Lemma 9')
                 return False
             
             if possiblyRes[i] == 'Not Solved':
@@ -745,7 +749,6 @@ def search(ig, G, PermsFileName, use5AT = False, PrintProof = False): #index of 
         NList = N.next(Angles, P, G, IndexFilledFace)
         #This assures you assign the first angletype to the first angle
         for N0 in NList:
-            #if N0.Assigned[Angles[0]] == 0:
             Stack.append(NList[0])
         while len(Stack) > 0:
             Branch = Stack.pop()

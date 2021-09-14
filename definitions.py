@@ -952,17 +952,7 @@ def search(ig, G, PermsFileName, PrintProof = False, Rectangle = False): #index 
         NList = N.next(Angles, P, G, IndexFilledSide, IndexFilledFace)
         #This assures you assign the first angletype to the first angle
         for N0 in NList:
-            Stack.append(NList[0])
-#            if N0.Assigned[Angles[0]] == 0:
-#                Stack.append(NList[0])
-#                if PrintProof:
-#                    print(f'Only considering Case 0, other cases are considered in a later labeling')
-#                else:
-#                    break
-#            else:
-#                if PrintProof:
-#                    print(f'    Skipping this case, it is considered in a later labeling')
-                    
+            Stack.append(NList[0])                    
         while len(Stack) > 0:
             Branch = Stack.pop(0)
             if(Branch.indexAngle == len(Angles)):
