@@ -78,3 +78,14 @@ G.draw()
 search(ig,G,'4_perms.txt',PrintProof=True)
 ```
 In the output, first a draw of the current graph (not necessarily planar) is showed and then the proof. We recommend to see a previously generated in one of these files. When a graph has possible equations to be realizable, these equations are shown.
+
+# NOTES ABOUT RESULTS
+
+## EQUIANGULAR
+
+In the paper we can see that some graphs are not filtered but are unrealizable. Every graph that is not filtered can be seen in the search files. We list the graphs that not produce a valid tiling here, using its respective number assigned in search file:
+
+<ul>
+    <li>5 tiles, 3 sides: 510, 1298, 1586</li>
+    <li>5 tiles, 4 sides: 6, 11, 60, 68, 72, 89, 91</li>
+</ul> 
