@@ -12,7 +12,7 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-#The class for the grahps.
+#The class for the graphs.
 #
 #The distinguished vertex should be 0 and its neighbours 1,2,3,4 in counter-clockwise order.
 #
@@ -223,7 +223,7 @@ def load_data(filename):
     return Data
 
 #Identifies the possible distinguished vertices of a graph and returns a list of the graphs with the distinguished vertex labeled as 0.
-def add_distinguished(G): #Constructs the grahps with an apex labeled as 0
+def add_distinguished(G): #Constructs the graphs with an apex labeled as 0
     graphs = []
     for v in G.pyramid_apexes():
         P = [] #Construct permutation with apex and neighbours first

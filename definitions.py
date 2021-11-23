@@ -11,7 +11,7 @@ from joblib import Parallel, delayed
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-#The class for grahps with a distinguished vertex S_0 labeled as 0.
+#The class for graphs with a distinguished vertex S_0 labeled as 0.
 #The distinguished vertex is 0 and its neighbours 1,2,3,4 in counter-clockwise order.
 #As in plantri, G[i] contains the vertices andyacent to vertex i in counter-clockwise order. If i is 1,2,3 or 4, G[i] should start with i-1,0,i+1.
 #The faces (which correspond to vertices of the tiles) begin with the outer faces 012, 023, 034, 041, followed by the corner faces containing 12, 23, 34, 41 in that order. Then the faces containing sides 1,2,3 or 4.
