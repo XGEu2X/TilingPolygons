@@ -2,7 +2,7 @@
 
 This is an implementation of the algorithms proposed in the article [Dissecting the square into seven or nine congruent parts](https://arxiv.org/abs/2104.04940). We recommend reading it first.
 
-The executables are provided on **Jupyter** notebooks, these are divided into **search** and **proof** files. In the first type of file, the main process is executed. In the second, the user can see a step by step explanation of what the deep search does for a given graph. To prvide a more detailed explanation of what these files do, we use the square case as an example. The notebooks for other variants (tiling a rectangle or using equiangular pieces) are similar but use filters that fit their conditions. It is important to note that **joblib.Parallel** is used to parallelize the process.
+The executables are provided on **Jupyter** notebooks, these are divided into **search** and **proof** files. In the first type of file, the main process is executed. In the second, the user can see a step by step explanation of what the deep search does for a given graph. To provide a more detailed explanation of what these files do, we use the square case as an example. The notebooks for other variants (tiling a rectangle or using equiangular pieces) are similar but use filters that fit their conditions. It is important to note that **joblib.Parallel** is used to parallelize the process.
 
 In the output, the current graph is drawn (not necessarily a planar drawing) and the proof follows.
 
