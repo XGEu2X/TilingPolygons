@@ -80,13 +80,13 @@ G=Graphs5_4[ig]
 G.draw()
 search(ig,G,'4_perms.txt',PrintProof=True)
 ```
-In the output, the current graph is drawn (not necessarily a planar drawing) and the proof follows. We recommend to see a previously generated proof in one of these files. When a graph has possible equations to be realized, these equations are shown.
+In the output, the current graph is drawn (not necessarily a planar drawing) and the proof follows. We recommend seeing a previously generated proof in one of these files. When a graph has possible equations to be realized, these equations are shown.
 
 # NOTES ABOUT RESULTS
 
 ## EQUIANGULAR CASE
 
-In the paper, we mention that some graphs are not filtered by the algorithm but are unrealizable. Every graph that is not filtered can be found in the search files. We list graphs that do not produce a valid tiling here, using its respective number assigned in the search file:
+In the paper, we mention that some graphs are not filtered by the algorithm but are unrealizable. Every graph that is not filtered can be found in the search files. We list the graphs that do not produce a valid tiling here, using its respective number assigned in the search file:
 
 <ul>
     <li>5 tiles, 3 sides: 510, 1298, 1586</li>
