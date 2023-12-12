@@ -1,6 +1,6 @@
 # WHAT IS IT?
 
-This is an implementation of the algorithms proposed in the article [Dissecting the square into seven or nine congruent parts]([https://arxiv.org/abs/2104.04940](https://www.sciencedirect.com/science/article/pii/S0012365X22000061?casa_token=oJryTNyL9YcAAAAA:sPaHFUhVSasikQ4vtMCgTpSS4rrfBJDjAdFnFD-nWQ0KUFSbmndg0zVjQ-P8UcIYNlEJpn6xr3ZX)). We recommend reading it first.
+This is an implementation of the algorithms proposed in the article [Dissecting the square into seven or nine congruent parts](https://www.sciencedirect.com/science/article/pii/S0012365X22000061?casa_token=oJryTNyL9YcAAAAA:sPaHFUhVSasikQ4vtMCgTpSS4rrfBJDjAdFnFD-nWQ0KUFSbmndg0zVjQ-P8UcIYNlEJpn6xr3ZX) We recommend reading it first.
 
 The executables are provided on **Jupyter** notebooks, these are divided into **search** and **proof** files. In the first type of file, the main process is executed. In the second, the user can see a step by step explanation of what the deep search does for a given graph. To provide a more detailed explanation of what these files do, we use the square case as an example. The notebooks for other variants (tiling a rectangle or using equiangular pieces) are similar but use filters that fit their conditions. It is important to note that **joblib.Parallel** is used to parallelize the process.
 
